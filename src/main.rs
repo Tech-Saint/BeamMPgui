@@ -14,14 +14,16 @@ fn main()  -> Result<(), eframe::Error> {
         initial_window_size: Some(egui::vec2(320.0, 240.0)),
         ..Default::default()
     };
-    read_config();
+    let (MPdir , NGdir )= read_config();
+
+
     // Our application state:
     let mut name = "Arthur".to_owned();
     let mut age = 42;
 
     eframe::run_simple_native("BeamMP_gui", options, move |ctx, _frame| {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("My egui Application");
+            ui.heading("");
             ui.horizontal(|ui| {
                 let name_label = ui.label("Your name: ");
                 ui.text_edit_singleline(&mut name)
@@ -36,7 +38,8 @@ fn main()  -> Result<(), eframe::Error> {
     })
 }
 
-fn read_config() {
+fn read_config() -> (String,String){
+    /* Returns Tuple of MP and then NG dirs. */
     static EMPTYCFG: &str ="path_of_Beam=''\npath_of_BeamMP_Executable=''\n";
     let cfg_path: String;
 
@@ -90,7 +93,6 @@ fn read_config() {
         };
     println!("BeamNG dir: {beamng_dir}");
 
-
     let caps = re_beammp.captures(&cfg);
     let beammp_dir = match caps {
         Some(value) => value["dir"].to_string(),
@@ -98,7 +100,19 @@ fn read_config() {
     }; 
 
     println!("BeamMP dir: {beammp_dir}");
+    let wrotecfg= format!("path_of_Beam='{}'\npath_of_BeamMP_Executable='{}'\n",beamng_dir,beammp_dir);
+    let path = Path::new(&cfg_path);
+    let display = path.display();
 
+    let mut file = match File::create(&path) {
+        Err(why) => panic!("Fatal Error: couldn't create {}: {}", display, why),
+        Ok(file) => file,
+    };
+    match file.write_all(&wrotecfg.as_bytes()) {
+        Err(why) => panic!("couldn't write to {}: {}", display, why),
+        Ok(_) => {},
+    }
+    return (beammp_dir , beamng_dir);
 }
 
 fn get_current_working_dir() -> String {
