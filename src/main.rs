@@ -1,6 +1,6 @@
 use eframe::egui;
 use rfd::FileDialog;
-use egui::FontTweak;
+
 use std::io::prelude::*;
 use std::{fs,env,fs::File,path::Path};
 use regex::Regex;
@@ -14,7 +14,7 @@ fn main()  -> Result<(), eframe::Error> {
         initial_window_size: Some(egui::vec2(320.0, 240.0)),
         ..Default::default()
     };
-    let (MPdir , NGdir )= read_config();
+    let (_MPdir , _NGdir )= read_config();
 
 
     // Our application state:
